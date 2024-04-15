@@ -116,7 +116,6 @@ if (otherUserEmail !== userEmail) {
   return (
     <div
       style={{
-       
         margin: "0 auto",
         backgroundColor: "#DFDFDF",
         marginTop: "30px",
@@ -140,7 +139,7 @@ if (otherUserEmail !== userEmail) {
           marginBottom: "10px",
         }}
       >
-        Navbar Content
+        Room ={roomId}
       </div>
 
       {/* Chat Boxes */}
@@ -186,7 +185,6 @@ if (otherUserEmail !== userEmail) {
                 setMessage(e.target.value);
               }}
               type="text"
-             
               value={message}
               name=""
               id=""

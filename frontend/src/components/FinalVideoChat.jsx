@@ -4,6 +4,10 @@ import socketIO from "socket.io-client";
 import { Button, Grid, Typography } from "@mui/material";
 import { CentralizedCard } from "./CentralizedCard";
 import { Video } from "./Video";
+import { useNavigate } from "react-router-dom";
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { isUserLoading } from "../store/selectors/isLoading";
+import { userEmailState } from "../store/selectors/userEmail";
 import { FRONTEND_URL, SOCKET_URL, URL } from "../assets/link";
 let pc = new RTCPeerConnection({
   iceServers: [
@@ -14,13 +18,22 @@ let pc = new RTCPeerConnection({
 });
 
 export function FinalVideoChat() {
+    const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
   const [meetingJoined, setMeetingJoined] = useState(false);
   const [videoStream, setVideoStream] = useState();
   const [remoteVideoStream, setRemoteVideoStream] = useState();
-
+  const userLoading = useRecoilValue(isUserLoading);
+   const userEmail = useRecoilValue(userEmailState);
   const params = useParams();
   const roomId = params.roomId;
+ useEffect(() => {
+     if (!userLoading && !userEmail) {
+       navigate("/"); // Redirect only when not loading and email is not available
+     }
+    
+    
+ }, [userLoading, userEmail, navigate]);
 
   useEffect(() => {
     const s = socketIO.connect(SOCKET_URL);
@@ -34,6 +47,7 @@ export function FinalVideoChat() {
       window.navigator.mediaDevices
         .getUserMedia({
           video: true,
+          // audio: true
         })
         .then(async (stream) => {
           setVideoStream(stream);
@@ -77,6 +91,8 @@ export function FinalVideoChat() {
         //s.emit("remoteDescription", { description: pc.localDescription });
       });
     });
+
+
   }, []);
 
   if (!videoStream) {
