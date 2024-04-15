@@ -186,9 +186,9 @@ app.get("/me", authenticateJwt, async (req, res) => {
 mongoose.connect(
   "mongodb+srv://kumashravan5:8Piz3bZ9jNpMkAJq@cluster0.t8zf1dw.mongodb.net/meetPoint"
 );
-app.listen(3000, () => {
+app.listen(3000, "192.168.29.52", () => {
   console.log("server is listening on port 3000");
 });
-server.listen(3001, () => {
+server.listen(3001,"192.168.29.52"() => {
   console.log("socket server is listening on port 3001");
 });

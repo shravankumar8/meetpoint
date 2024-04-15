@@ -14,7 +14,7 @@ export const Video = ({ stream }) => {
         <video
           style={{ borderRadius: 10 }}
           ref={videoRef}
-          muted
+          // muted
           width="100%"
           autoPlay={true}
           playsInline={true}

@@ -24,6 +24,7 @@ export function FinalVideoChat() {
   const [videoStream, setVideoStream] = useState();
   const [remoteVideoStream, setRemoteVideoStream] = useState();
   const userLoading = useRecoilValue(isUserLoading);
+   const [audioStream, setAudioStream] = useState();
    const userEmail = useRecoilValue(userEmailState);
   const params = useParams();
   const roomId = params.roomId;
@@ -47,10 +48,11 @@ export function FinalVideoChat() {
       window.navigator.mediaDevices
         .getUserMedia({
           video: true,
-          // audio: true
+          audio: true
         })
         .then(async (stream) => {
           setVideoStream(stream);
+          // setAudioStream(stream)
         });
 
       s.on("localDescription", async ({ description }) => {
@@ -156,9 +158,11 @@ export function FinalVideoChat() {
       justifyContent={"center"}
     >
       <Grid item xs={12} md={6} lg={4}>
+        
         <Video stream={videoStream} />
       </Grid>
       <Grid item xs={12} md={6} lg={4}>
+        
         <Video stream={remoteVideoStream} />
       </Grid>
     </Grid>
