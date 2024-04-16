@@ -26,9 +26,10 @@ function Videochat() {
   const userEmail = useRecoilValue(userEmailState);
    
   useEffect(() => {
-    if (!userLoading && !userEmail) {
-      navigate("/"); // Redirect only when not loading and email is not available
-    }
+     if (!userLoading && !userEmail) {
+       navigate("/"); // Redirect only when not loading and email is not available
+     }
+    
   }, [userLoading, userEmail, navigate]);
   if (!userEmail || userLoading) {
     // Return loading state or handle redirect when user email is not available
