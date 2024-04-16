@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { userEmailState } from "../store/selectors/userEmail";
 import { useRecoilValue } from "recoil";
 import { isUserLoading } from "../store/selectors/isLoading";
@@ -11,7 +11,7 @@ import { SOCKET_URL } from "../assets/link";
 
 function Textroom() {
 
-
+const navigate=useNavigate()
   const [socket, setSocket] = useState(null);
   const params = useParams();
   const roomId = params.roomId;
