@@ -43,7 +43,7 @@ const navigate=useNavigate()
     
     async function connectToSocket() {
       if (!userEmail) {
-        // Handle case where userEmail is not available yet
+        // Handle case here userEmail is not available yet
         return;
       }
 
