@@ -1,7 +1,9 @@
-name: Deploy
+name: DeployBackend
 
 on:
   push:
+    paths:
+      -'Gmeet_clonde/backend/**'
     branches:
       - main # or the branch you want to deploy from
 
