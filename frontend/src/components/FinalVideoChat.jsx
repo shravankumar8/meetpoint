@@ -9,6 +9,20 @@ import { useSetRecoilState, useRecoilValue } from "recoil";
 import { isUserLoading } from "../store/selectors/isLoading";
 import { userEmailState } from "../store/selectors/userEmail";
 import { FRONTEND_URL, SOCKET_URL, URL } from "../assets/link";
+import videoMeetingIMg from "../assets/VideoMeeting.png";
+import streamImg from "../assets/streamImg.png";
+import meetingImg from "../assets/meetingImg.png";
+import ChatRoomImg from "../assets/chatRoomImg.png";
+import joinCallImg from "../assets/joinCallImg.png";
+import screenshared_enabled from '../assets/screenshared_enabled.png'
+import screenshared_disabled from '../assets/screenshred_disabled.png'
+import videoshare_enabled from '../assets/videoshare_enabled.png'
+import videoshare_disabled from '../assets/videoshare_disbled.png'
+import micshare_enabled from '../assets/micshare_enabled.png'
+import micshare_disabled from '../assets/micshare_disabled.png'
+import call_disconnect from '../assets/disconnet.png'
+
+
 let pc = new RTCPeerConnection({
   iceServers: [
     {
@@ -25,7 +39,12 @@ export function FinalVideoChat() {
   const [remoteVideoStream, setRemoteVideoStream] = useState();
   const userLoading = useRecoilValue(isUserLoading);
    const [audioStream, setAudioStream] = useState();
+   const [micState, setMicState] = useState(true);
+   const [videoState, setVideoState] = useState(true);
+   
+   const [screenState, setScreenState] = useState(false);
    const userEmail = useRecoilValue(userEmailState);
+  //  const [micStatus,setMicStatus] = useState(true)
   const params = useParams();
   const roomId = params.roomId;
  useEffect(() => {
@@ -48,7 +67,7 @@ export function FinalVideoChat() {
       window.navigator.mediaDevices
         .getUserMedia({
           video: true,
-          audio: true
+          audio: true,
         })
         .then(async (stream) => {
           setVideoStream(stream);
@@ -96,6 +115,87 @@ export function FinalVideoChat() {
 
 
   }, []);
+  let buttons = [
+    {
+      title: "share screen",
+      state: screenState,
+      enableimg: screenshared_enabled,
+      disableimg: screenshared_disabled,
+      onClick: () => {},
+    },
+    {
+      title: "stop video",
+      state: videoState,
+      enableimg: videoshare_enabled,
+      disableimg: videoshare_disabled,
+      onClick: () => {
+        if (videoState) {
+          window.navigator.mediaDevices
+            .getUserMedia({
+              video: false,
+              audio: micState,
+            })
+            .then(async (stream) => {
+              setVideoStream(stream);
+              // setAudioStream(stream)
+            });
+          setVideoState(false);
+        } else {
+          window.navigator.mediaDevices
+            .getUserMedia({
+              video: true,
+              audio: micState,
+            })
+            .then(async (stream) => {
+              setVideoStream(stream);
+              // setAudioStream(stream)
+            });
+          setVideoState(true);
+        }
+      },
+    },
+    {
+      title: "Mute",
+      enableimg: micshare_enabled,
+      disableimg: micshare_disabled,
+      state: micState,
+      onClick: () => {
+        if (micState) {
+          window.navigator.mediaDevices
+            .getUserMedia({
+              video: true,
+              audio: false,
+            })
+            .then(async (stream) => {
+              setVideoStream(stream);
+              // setAudioStream(stream)
+            });
+          setMicState(false);
+        } else {
+          window.navigator.mediaDevices
+            .getUserMedia({
+              video: true,
+              audio: true,
+            })
+            .then(async (stream) => {
+              setVideoStream(stream);
+              // setAudioStream(stream)
+            });
+          setMicState(true);
+        }
+      },
+    },
+    {
+      title: "Disconnect",
+      state: true,
+      enableimg: call_disconnect,
+      disableimg: call_disconnect,
+
+      onClick: () => {
+        console.log("share screen");
+      },
+    },
+  ];
 
   if (!videoStream) {
     return <div>Loading...</div>;
@@ -151,20 +251,58 @@ export function FinalVideoChat() {
   }
   console.log({ remoteVideoStream, videoStream });
   return (
-    <Grid
-      container
-      spacing={2}
-      alignContent={"center"}
-      justifyContent={"center"}
-    >
-      <Grid item xs={12} md={6} lg={4}>
-        
-        <Video stream={videoStream} />
-      </Grid>
-      <Grid item xs={12} md={6} lg={4}>
-        
-        <Video stream={remoteVideoStream} />
-      </Grid>
-    </Grid>
+    <div style={{ display: "flex", flexDirection: "column",margin:"0 auto" }}>
+      <div>
+        <Grid
+          container
+          spacing={2}
+          alignContent={"center"}
+          justifyContent={"center"}
+        >
+          <Grid item xs={12} md={6} lg={5}>
+            my
+            <Video stream={videoStream} />
+          </Grid>
+          <Grid item xs={12} md={6} lg={5}>
+            yours
+            <Video stream={remoteVideoStream} />
+          </Grid>
+        </Grid>
+      </div>
+      <div style={{  display: "flex",margin:"0 auto ", }}>
+        {buttons.map((button,index) => (
+          <Grid key={index} item xs={6} sm={3} md={2}>
+            <div 
+              onClick={button.onClick}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "column",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "36px",
+                maxWidth: "200px",
+                padding: "10px",
+                margin:"0px 10px",
+                alignItems: "center",
+              }}
+            >{button.state?
+              <img
+                style={{ maxWidth: "40px", opacity: "0.8" }}
+                src={button.enableimg}
+                alt=""
+              />:
+              <img
+                style={{ maxWidth: "40px", opacity: "0.8" }}
+                src={button.disableimg}
+                alt=""
+              />}
+              <div style={{ marginTop: "10px", fontSize: " 1em" }}>
+                {button.title}
+              </div>
+            </div>
+          </Grid>
+        ))}
+      </div>
+    </div>
   );
 }

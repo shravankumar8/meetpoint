@@ -47,7 +47,7 @@ const navigate=useNavigate()
         return;
       }
 
-      const s = await io.connect("http://localhost:3001");
+      const s = await io.connect(SOCKET_URL);
       s.on("connect", () => {
         console.log("User email:", userEmail);
         setSocket(s);
