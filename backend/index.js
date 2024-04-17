@@ -138,7 +138,7 @@ io.on("connection", (socket) => {
 
 app.use(express.json());
 app.get("/max", async (req, res) => {
-  res.json({ users:users,message:"testing adwdsswedwedfdsw" });
+  res.json({ users:users,message:"testing the anns" });
 });
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
