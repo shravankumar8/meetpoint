@@ -4,8 +4,10 @@ name: Backend Deployment
 
 on:
   push:
-   branches:
-      - main
+   branches: [ main ]
+    paths: 
+       
+       - 'backend/**'
     # paths:
     #   -'Gmeet_clone/backend/**'
    
