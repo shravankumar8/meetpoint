@@ -6,8 +6,8 @@ on:
   push:
    branches:
       - main
-    paths:
-      -'Gmeet_clone/backend/**'
+    # paths:
+    #   -'Gmeet_clone/backend/**'
    
 
 
