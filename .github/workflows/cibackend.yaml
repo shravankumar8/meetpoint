@@ -1,11 +1,14 @@
-name: DeployBackend
+
+
+name: Backend Deployment
 
 on:
   push:
     paths:
-      -'Gmeet_clonde/backend/**'
+      - 'Gmeet_clonde/backend/**'
     branches:
-      - main # or the branch you want to deploy from
+      - main
+
 
 jobs:
   deploy:
