@@ -7,7 +7,7 @@ on:
    branches:
       - main
     paths:
-      - /backend/**
+      -Gmeet_clone/backend
    
 
 
