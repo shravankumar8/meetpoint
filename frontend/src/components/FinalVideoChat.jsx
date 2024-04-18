@@ -136,11 +136,7 @@ try{
           // Replace screen sharing stream with the original video stream
           setVideoStream(userStream.current);
           setOtherUserVIdeo(userStream.current);
-<<<<<<< HEAD
           pc.addTrack(userStream.current.getTracks()[0]); // Add back the video track
-=======
-          pc.addTrack(userStream.current.getTracks()[1]); // Add back the video track
->>>>>>> b6230f0b63fcf8aecc89e7df7bc54bb2011c1aa2
         };
       })
       .catch((error) => {
