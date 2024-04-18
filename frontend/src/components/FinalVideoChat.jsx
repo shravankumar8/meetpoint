@@ -41,8 +41,8 @@ export function FinalVideoChat() {
    const [audioStream, setAudioStream] = useState();
    const [micState, setMicState] = useState(true);
    const [videoState, setVideoState] = useState(true);
-   
-   const [screenState, setScreenState] = useState(false);
+   const [otherUserVIdeo,setOtherUserVIdeo]=useState()
+   const [screenState, setScreenState] = useState(true);
    const userEmail = useRecoilValue(userEmailState);
   //  const [micStatus,setMicStatus] = useState(true)
   const params = useParams();
@@ -63,16 +63,21 @@ export function FinalVideoChat() {
 
         roomId,
       });
-
-      window.navigator.mediaDevices
+try{
+ window.navigator.mediaDevices
         .getUserMedia({
           video: true,
           audio: true,
         })
         .then(async (stream) => {
           setVideoStream(stream);
+          setOtherUserVIdeo(stream)
           // setAudioStream(stream)
         });
+}catch (error){
+  console.log("please allow permissions")
+}
+     
 
       s.on("localDescription", async ({ description }) => {
         // Receiving video -
@@ -115,13 +120,41 @@ export function FinalVideoChat() {
 
 
   }, []);
+  const shareScreenfunc = () => {
+    navigator.mediaDevices
+      .getDisplayMedia({ cursor: true })
+      .then((screenStream) => {
+        // Replace the current video stream with the screen sharing stream
+        setVideoStream(screenStream);
+        setOtherUserVIdeo(screenStream);
+
+        // Add the screen sharing stream to the peer connection
+        pc.addTrack(screenStream.getTracks()[0]);
+
+        // Handle ending of screen sharing
+        screenStream.onended = () => {
+          // Replace screen sharing stream with the original video stream
+          setVideoStream(userStream.current);
+          setOtherUserVIdeo(userStream.current);
+          pc.addTrack(userStream.current.getTracks()[0]); // Add back the video track
+        };
+      })
+      .catch((error) => {
+        console.error("Error sharing screen:", error);
+      });
+  };
+
+
+
+
+
   let buttons = [
     {
       title: "share screen",
       state: screenState,
       enableimg: screenshared_enabled,
       disableimg: screenshared_disabled,
-      onClick: () => {},
+      onClick: shareScreenfunc
     },
     {
       title: "stop video",
@@ -129,6 +162,12 @@ export function FinalVideoChat() {
       enableimg: videoshare_enabled,
       disableimg: videoshare_disabled,
       onClick: () => {
+      
+
+
+
+
+
         if (videoState) {
           window.navigator.mediaDevices
             .getUserMedia({
@@ -137,6 +176,9 @@ export function FinalVideoChat() {
             })
             .then(async (stream) => {
               setVideoStream(stream);
+              
+              pc.addTrack(stream.getVideoTracks()[0]);
+
               // setAudioStream(stream)
             });
           setVideoState(false);
@@ -179,6 +221,7 @@ export function FinalVideoChat() {
             })
             .then(async (stream) => {
               setVideoStream(stream);
+              setOtherUserVIdeo(stream)
               // setAudioStream(stream)
             });
           setMicState(true);
@@ -219,7 +262,7 @@ export function FinalVideoChat() {
                 pc.onicecandidate = ({ candidate }) => {
                   socket.emit("iceCandidate", { candidate });
                 };
-                pc.addTrack(videoStream.getVideoTracks()[0]);
+                pc.addTrack(otherUserVIdeo.getVideoTracks()[0]);
                 try {
                   await pc.setLocalDescription(await pc.createOffer());
                   console.log({ aa: pc.localDescription });

@@ -13,6 +13,9 @@ import ChatRoom from "./components/Chatroom";
 import Textroom from "./components/Textroom";
 import VideoChat from "./components/VideoChat";
 import {FinalVideoChat} from "./components/FinalVideoChat";
+import About from "./components/About";
+import Features from "./components/Features";
+import HowItWorks from "./components/Howitworks";
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
           <Route path="/chatroom" element={<ChatRoom />} />
           <Route path="/videochat" element={<VideoChat />} />
           <Route path="/videochat/:roomId" element={<FinalVideoChat />} />
+          <Route path="about" element={<About />} />
+          <Route path="features" element={<Features />} />
+          <Route path="howitworks" element={<HowItWorks />} />
         </Routes>
       </Router>
     </RecoilRoot>
