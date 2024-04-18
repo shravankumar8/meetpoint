@@ -1,8 +1,8 @@
 
-const URL = "http://localhost:3000";
-const SOCKET_URL = "http://localhost:3001";
-// const URL = "https://meetpointapi.yourshravan.tech";
-// const SOCKET_URL = "https://sockets.yourshravan.tech";
+// const URL = "http://localhost:3000";
+// const SOCKET_URL = "http://localhost:3001";
+const URL = "https://meetpointapi.yourshravan.tech";
+const SOCKET_URL = "https://sockets.yourshravan.tech";
 const FRONTEND_URL = "http://localhost:5173";
 
 
