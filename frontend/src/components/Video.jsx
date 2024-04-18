@@ -15,6 +15,9 @@ export const Video = ({ stream }) => {
           style={{ borderRadius: 10 }}
           ref={videoRef}
           // muted
+          controls
+          // controlslist="play timeline volume"
+       
           width="100%"
           autoPlay={true}
           playsInline={true}
