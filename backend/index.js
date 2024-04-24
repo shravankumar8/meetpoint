@@ -30,6 +30,22 @@ io.on("connection", (socket) => {
     delete users[socket.id];
   });
 
+  socket.on("userMessage",(params) => {
+      let roomId = users[socket.id].roomId;
+      console.log(roomId);
+       let otherUsers = rooms[roomId].users;
+    console.log(socket.id,"has sent",params.message)
+
+     otherUsers.forEach((otherUser) => {
+       if (otherUser !== socket.id) {
+         io.to(otherUser).emit("userMessage", {
+           message: params.message,
+         });
+       }
+     });
+
+  });
+
   socket.on("localDescription", (params) => {
     let roomId = users[socket.id].roomId;
 

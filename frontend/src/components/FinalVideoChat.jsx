@@ -14,14 +14,15 @@ import streamImg from "../assets/streamImg.png";
 import meetingImg from "../assets/meetingImg.png";
 import ChatRoomImg from "../assets/chatRoomImg.png";
 import joinCallImg from "../assets/joinCallImg.png";
-import screenshared_enabled from '../assets/screenshared_enabled.png'
-import screenshared_disabled from '../assets/screenshred_disabled.png'
-import videoshare_enabled from '../assets/videoshare_enabled.png'
-import videoshare_disabled from '../assets/videoshare_disbled.png'
-import micshare_enabled from '../assets/micshare_enabled.png'
-import micshare_disabled from '../assets/micshare_disabled.png'
-import call_disconnect from '../assets/disconnet.png'
-
+import screenshared_enabled from "../assets/screenshared_enabled.png";
+import screenshared_disabled from "../assets/screenshred_disabled.png";
+import videoshare_enabled from "../assets/videoshare_enabled.png";
+import videoshare_disabled from "../assets/videoshare_disbled.png";
+import micshare_enabled from "../assets/micshare_enabled.png";
+import micshare_disabled from "../assets/micshare_disabled.png";
+import call_disconnect from "../assets/disconnet.png";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 let pc = new RTCPeerConnection({
   iceServers: [
@@ -32,60 +33,68 @@ let pc = new RTCPeerConnection({
 });
 
 export function FinalVideoChat() {
-    const navigate = useNavigate();
+  const notify = () =>
+    toast("Joined meeting successfully!", { type: "success" });
+  const messageNotify = (message) => toast(message, { type: "warn" });
+  const navigate = useNavigate();
   const [socket, setSocket] = useState();
   const [meetingJoined, setMeetingJoined] = useState(false);
-  const [videoStream, setVideoStream] = useState(null);
+  const [videoStream, setVideoStream] = useState();
   const [remoteVideoStream, setRemoteVideoStream] = useState();
   const userLoading = useRecoilValue(isUserLoading);
-   const [audioStream, setAudioStream] = useState();
-   const [micState, setMicState] = useState(true);
-   const [videoState, setVideoState] = useState(true);
-   const [otherUserVIdeo,setOtherUserVIdeo]=useState()
-   const [screenState, setScreenState] = useState(false);
-   const userEmail = useRecoilValue(userEmailState);
+  const [audioStream, setAudioStream] = useState();
+  const [micState, setMicState] = useState(true);
+  const [videoState, setVideoState] = useState(true);
+  const [otherUserVIdeo, setOtherUserVIdeo] = useState();
+  const [screenState, setScreenState] = useState(false);
+  const userEmail = useRecoilValue(userEmailState);
   //  const [micStatus,setMicStatus] = useState(true)
   const params = useParams();
   const roomId = params.roomId;
- useEffect(() => {
-     if (!userLoading && !userEmail) {
-       navigate("/"); // Redirect only when not loading and email is not available
-     }
-    
-    
- }, [userLoading, userEmail, navigate]);
+  useEffect(() => {
+    if (!userLoading && !userEmail) {
+      navigate("/"); // Redirect only when not loading and email is not available
+    }
+  }, [userLoading, userEmail, navigate]);
 
   useEffect(() => {
     const s = socketIO.connect(SOCKET_URL);
     s.on("connect", () => {
       setSocket(s);
       s.emit("join", {
-
         roomId,
       });
-try{
- window.navigator.mediaDevices
-        .getUserMedia({
-          video: true,
-          audio: true,
-        })
-        .then(async (stream) => {
-          setVideoStream(stream);
-        
-          // setAudioStream(stream)
-        });
-}catch (error){
-  console.log("please allow permissions")
-}
-     
+      try {
+        console.log("wegwgvrsgrg");
+        window.navigator.mediaDevices
+          .getUserMedia({
+            video: true,
+            audio: true,
+          })
+          .then(async (stream) => {
+            setVideoStream(stream);
+
+            // setAudioStream(stream)
+          });
+      } catch (error) {
+        console.log("please allow permissions");
+      }
+      s.on("userMessage", (params) => {
+        console.log(params.message);
+        messageNotify(params.message);
+      });
 
       s.on("localDescription", async ({ description }) => {
         // Receiving video -
         console.log({ description });
         pc.setRemoteDescription(description);
-         pc.ontrack = (e) => {
-           setRemoteVideoStream(new MediaStream([e.track]));
-         };
+        pc.ontrack = (e) => {
+          s.emit("userMessage", {
+            message: "a user has joined the call ",
+          });
+          
+          setRemoteVideoStream(new MediaStream([e.track]));
+        };
 
         s.on("iceCandidate", ({ candidate }) => {
           pc.addIceCandidate(candidate);
@@ -101,14 +110,13 @@ try{
         // Receiving video -
         console.log({ description });
         pc.setRemoteDescription(description);
-        console.log("haa coming")
+        console.log("haa coming");
         pc.ontrack = (e) => {
           setRemoteVideoStream(new MediaStream([e.track]));
         };
-          pc.ontrack = (e) => {
-            setRemoteVideoStream(new MediaStream([e.track]));
-          };
-
+        pc.ontrack = (e) => {
+          setRemoteVideoStream(new MediaStream([e.track]));
+        };
 
         s.on("iceCandidate", ({ candidate }) => {
           pc.addIceCandidate(candidate);
@@ -121,63 +129,50 @@ try{
         //s.emit("remoteDescription", { description: pc.localDescription });
       });
     });
-
-
   }, []);
-const shareScreenfunc = () => {
-  // Function to capture and send the screen instead of the camera front screen
-if (!screenState){
+  const shareScreenfunc = () => {
+    // Function to capture and send the screen instead of the camera front screen
+    if (!screenState) {
+       
+      navigator.mediaDevices
+        .getDisplayMedia({ audio: true, video: true })
+        .then((screenStream) => {
+          const screenTrack = screenStream.getTracks()[0];
+          setVideoStream(screenStream);
+socket.emit("userMessage", {
+  message: "user has started sharing screen",
+});
+          // Replace the current video stream with the screen sharing stream
+          pc.getSenders().forEach((sender) => {
+            if (sender.track.kind === "video") {
+              sender.replaceTrack(screenStream.getVideoTracks()[0]);
+            }
+          });
+           
+          screenTrack.onended = () => {
+            console.log("screen ended");
+            window.navigator.mediaDevices
+              .getUserMedia({
+                video: true,
+                audio: micState,
+              })
+              .then(async (stream) => {
+                pc.getSenders().forEach((sender) => {
+                  if (sender.track.kind === "video") {
+                    sender.replaceTrack(stream.getVideoTracks()[0]);
+                  }
+                });
 
-navigator.mediaDevices
-  .getDisplayMedia({ audio: true, video: true })
-  .then((screenStream) => {
-    const screenTrack = screenStream.getTracks()[0];
-    setVideoStream(screenStream);
-
-    // Replace the current video stream with the screen sharing stream
-    pc.getSenders().forEach((sender) => {
-      if (sender.track.kind === "video") {
-        sender.replaceTrack(screenStream.getVideoTracks()[0]);
-      }
-    });
-    screenTrack.onended=()=>{
-
-
-
-
-      
-      console.log("screen ended")
-  window.navigator.mediaDevices
-            .getUserMedia({
-              video: true,
-              audio: micState,
-            })
-            .then(async (stream) => {
-
-   pc.getSenders().forEach((sender) => {
-     if (sender.track.kind === "video") {
-       sender.replaceTrack(stream.getVideoTracks()[0]);
-     }
-   });
-
-
-
-              setVideoStream(stream);})
-
-      
+                setVideoStream(stream);
+              });
+               socket.emit("userMessage", {
+                 message: "user has stopped sharing screen",
+               });
+          };
+        })
+        .catch(console.error);
     }
-
-
-  })
-  .catch(console.error);
-
-}
-  
-  
-}
-
-
-
+  };
 
   let buttons = [
     {
@@ -194,6 +189,7 @@ navigator.mediaDevices
       disableimg: videoshare_disabled,
       onClick: () => {
         if (videoState) {
+          socket.emit("userMessage", { message: "user has paused his video" });
           window.navigator.mediaDevices
             .getUserMedia({
               video: false,
@@ -201,13 +197,21 @@ navigator.mediaDevices
             })
             .then(async (stream) => {
               setVideoStream(stream);
-
-              pc.addTrack(stream.getVideoTracks()[0]);
+              pc.getSenders().forEach((sender) => {
+                if (sender.track.kind === "video") {
+                  console.log("billu bhai ");
+                  sender.replaceTrack(stream.getVideoTracks()[0]);
+                }
+                
+              });
 
               // setAudioStream(stream)
             });
           setVideoState(false);
         } else {
+          socket.emit("userMessage", {
+            message: "user has unpaused his video",
+          });
           window.navigator.mediaDevices
             .getUserMedia({
               video: true,
@@ -215,8 +219,16 @@ navigator.mediaDevices
             })
             .then(async (stream) => {
               setVideoStream(stream);
+              pc.getSenders().forEach((sender) => {
+                if (sender.track.kind === "video") {
+                  sender.replaceTrack(stream.getVideoTracks()[0]);
+                }
+                
+              });
+
               // setAudioStream(stream)
             });
+
           setVideoState(true);
         }
       },
@@ -284,6 +296,7 @@ navigator.mediaDevices
             <Button
               onClick={async () => {
                 // sending pc
+                notify();
                 pc.onicecandidate = ({ candidate }) => {
                   socket.emit("iceCandidate", { candidate });
                 };
@@ -337,6 +350,8 @@ navigator.mediaDevices
           </Grid>
         </Grid>
       </div>
+      <ToastContainer position="top-right" autoClose={2000} />
+      //
       <div style={{ display: "flex", margin: "0 auto " }}>
         {buttons.map((button, index) => (
           <Grid key={index} item xs={6} sm={3} md={2}>

@@ -36,7 +36,7 @@ function Videochat() {
     return <div>Loading...</div>;
   }
    const handleToggleChange = (event) => {
-    //  setroomIdGen(event.target.checked);
+    //  setroomIdGen(event.target.checked);z
      if(event.target.checked){
 
         setRoomId(Math.random().toString(36).substring(2, 8));

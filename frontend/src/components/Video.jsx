@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export const Video = ({ stream ,audiomuted}) => {
+export const Video = ({ stream, Audiomuted }) => {
   const videoRef = useRef();
   useEffect(() => {
     if (videoRef && videoRef.current) {
@@ -14,7 +14,7 @@ export const Video = ({ stream ,audiomuted}) => {
         <video
           style={{ borderRadius: 10 }}
           ref={videoRef}
-          muted={audiomuted}
+          // muted={Audiomuted}
           controls
           // controlslist="play timeline volume"
           width="100%"
