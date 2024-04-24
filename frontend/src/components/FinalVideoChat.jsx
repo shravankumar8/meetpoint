@@ -33,16 +33,16 @@ let pc = new RTCPeerConnection({
 
 export function FinalVideoChat() {
     const navigate = useNavigate();
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState();
   const [meetingJoined, setMeetingJoined] = useState(false);
-  const [videoStream, setVideoStream] = useState();
+  const [videoStream, setVideoStream] = useState(null);
   const [remoteVideoStream, setRemoteVideoStream] = useState();
   const userLoading = useRecoilValue(isUserLoading);
    const [audioStream, setAudioStream] = useState();
    const [micState, setMicState] = useState(true);
    const [videoState, setVideoState] = useState(true);
    const [otherUserVIdeo,setOtherUserVIdeo]=useState()
-   const [screenState, setScreenState] = useState(true);
+   const [screenState, setScreenState] = useState(false);
    const userEmail = useRecoilValue(userEmailState);
   //  const [micStatus,setMicStatus] = useState(true)
   const params = useParams();
@@ -71,7 +71,7 @@ try{
         })
         .then(async (stream) => {
           setVideoStream(stream);
-          setOtherUserVIdeo(stream)
+        
           // setAudioStream(stream)
         });
 }catch (error){
@@ -83,9 +83,9 @@ try{
         // Receiving video -
         console.log({ description });
         pc.setRemoteDescription(description);
-        pc.ontrack = (e) => {
-          setRemoteVideoStream(new MediaStream([e.track]));
-        };
+         pc.ontrack = (e) => {
+           setRemoteVideoStream(new MediaStream([e.track]));
+         };
 
         s.on("iceCandidate", ({ candidate }) => {
           pc.addIceCandidate(candidate);
@@ -105,6 +105,10 @@ try{
         pc.ontrack = (e) => {
           setRemoteVideoStream(new MediaStream([e.track]));
         };
+          pc.ontrack = (e) => {
+            setRemoteVideoStream(new MediaStream([e.track]));
+          };
+
 
         s.on("iceCandidate", ({ candidate }) => {
           pc.addIceCandidate(candidate);
@@ -120,30 +124,57 @@ try{
 
 
   }, []);
-  const shareScreenfunc = () => {
-    navigator.mediaDevices
-      .getDisplayMedia({ cursor: true })
-      .then((screenStream) => {
-        // Replace the current video stream with the screen sharing stream
-        setVideoStream(screenStream);
-        setOtherUserVIdeo(screenStream);
+const shareScreenfunc = () => {
+  // Function to capture and send the screen instead of the camera front screen
+if (!screenState){
 
-        // Add the screen sharing stream to the peer connection
-        pc.addTrack(screenStream.getTracks()[0]);
+navigator.mediaDevices
+  .getDisplayMedia({ audio: true, video: true })
+  .then((screenStream) => {
+    const screenTrack = screenStream.getTracks()[0];
+    setVideoStream(screenStream);
 
-        // Handle ending of screen sharing
-        screenStream.onended = () => {
-          // Replace screen sharing stream with the original video stream
-          setVideoStream(userStream.current);
-          setOtherUserVIdeo(userStream.current);
-          pc.addTrack(userStream.current.getTracks()[0]); // Add back the video track
-        };
-      })
-      .catch((error) => {
-        console.error("Error sharing screen:", error);
-      });
-  };
+    // Replace the current video stream with the screen sharing stream
+    pc.getSenders().forEach((sender) => {
+      if (sender.track.kind === "video") {
+        sender.replaceTrack(screenStream.getVideoTracks()[0]);
+      }
+    });
+    screenTrack.onended=()=>{
 
+
+
+
+      
+      console.log("screen ended")
+  window.navigator.mediaDevices
+            .getUserMedia({
+              video: true,
+              audio: micState,
+            })
+            .then(async (stream) => {
+
+   pc.getSenders().forEach((sender) => {
+     if (sender.track.kind === "video") {
+       sender.replaceTrack(stream.getVideoTracks()[0]);
+     }
+   });
+
+
+
+              setVideoStream(stream);})
+
+      
+    }
+
+
+  })
+  .catch(console.error);
+
+}
+  
+  
+}
 
 
 
@@ -153,8 +184,8 @@ try{
       title: "share screen",
       state: screenState,
       enableimg: screenshared_enabled,
-      disableimg: screenshared_disabled,
-      onClick: shareScreenfunc
+      disableimg: screenshared_enabled,
+      onClick: shareScreenfunc,
     },
     {
       title: "stop video",
@@ -162,12 +193,6 @@ try{
       enableimg: videoshare_enabled,
       disableimg: videoshare_disabled,
       onClick: () => {
-      
-
-
-
-
-
         if (videoState) {
           window.navigator.mediaDevices
             .getUserMedia({
@@ -176,7 +201,7 @@ try{
             })
             .then(async (stream) => {
               setVideoStream(stream);
-              
+
               pc.addTrack(stream.getVideoTracks()[0]);
 
               // setAudioStream(stream)
@@ -221,7 +246,7 @@ try{
             })
             .then(async (stream) => {
               setVideoStream(stream);
-              setOtherUserVIdeo(stream)
+              setOtherUserVIdeo(stream);
               // setAudioStream(stream)
             });
           setMicState(true);
@@ -262,7 +287,7 @@ try{
                 pc.onicecandidate = ({ candidate }) => {
                   socket.emit("iceCandidate", { candidate });
                 };
-                pc.addTrack(otherUserVIdeo.getVideoTracks()[0]);
+                pc.addTrack(videoStream.getVideoTracks()[0]);
                 try {
                   await pc.setLocalDescription(await pc.createOffer());
                   console.log({ aa: pc.localDescription });
@@ -294,7 +319,7 @@ try{
   }
   console.log({ remoteVideoStream, videoStream });
   return (
-    <div style={{ display: "flex", flexDirection: "column",margin:"0 auto" }}>
+    <div style={{ display: "flex", flexDirection: "column", margin: "0 auto" }}>
       <div>
         <Grid
           container
@@ -304,18 +329,18 @@ try{
         >
           <Grid item xs={12} md={6} lg={5}>
             my
-            <Video stream={videoStream} />
+            <Video stream={videoStream} Audiomuted={true} />
           </Grid>
           <Grid item xs={12} md={6} lg={5}>
             yours
-            <Video stream={remoteVideoStream} />
+            <Video stream={remoteVideoStream} Audiomuted={false} />
           </Grid>
         </Grid>
       </div>
-      <div style={{  display: "flex",margin:"0 auto ", }}>
-        {buttons.map((button,index) => (
+      <div style={{ display: "flex", margin: "0 auto " }}>
+        {buttons.map((button, index) => (
           <Grid key={index} item xs={6} sm={3} md={2}>
-            <div 
+            <div
               onClick={button.onClick}
               style={{
                 cursor: "pointer",
@@ -325,20 +350,23 @@ try{
                 borderRadius: "36px",
                 maxWidth: "200px",
                 padding: "10px",
-                margin:"0px 10px",
+                margin: "0px 10px",
                 alignItems: "center",
               }}
-            >{button.state?
-              <img
-                style={{ maxWidth: "40px", opacity: "0.8" }}
-                src={button.enableimg}
-                alt=""
-              />:
-              <img
-                style={{ maxWidth: "40px", opacity: "0.8" }}
-                src={button.disableimg}
-                alt=""
-              />}
+            >
+              {button.state ? (
+                <img
+                  style={{ maxWidth: "40px", opacity: "0.8" }}
+                  src={button.enableimg}
+                  alt=""
+                />
+              ) : (
+                <img
+                  style={{ maxWidth: "40px", opacity: "0.8" }}
+                  src={button.disableimg}
+                  alt=""
+                />
+              )}
               <div style={{ marginTop: "10px", fontSize: " 1em" }}>
                 {button.title}
               </div>
