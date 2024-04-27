@@ -23,11 +23,11 @@ const navigate=useNavigate()
   const [messageDom, setMessageDom] = useState([
     {
       name: "lingampally.venkey",
-      message: " ga annam tinnava ?",
+      message: " testing default message  ?",
     },
     {
       name: "kumashrva.venkey",
-      message: " ga annam tinnava ?",
+      message: " testing default message?",
     },
   ]);
 

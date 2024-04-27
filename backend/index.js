@@ -30,6 +30,20 @@ io.on("connection", (socket) => {
     delete users[socket.id];
   });
 
+
+socket.on("localDescription", (params) => {
+  let roomId = users[socket.id].roomId;
+
+  let otherUsers = rooms[roomId].users;
+  otherUsers.forEach((otherUser) => {
+    if (otherUser !== socket.id) {
+      io.to(otherUser).emit("localDescription", {
+        description: params.description,
+      });
+    }
+  });
+});
+
   socket.on("userMessage",(params) => {
       let roomId = users[socket.id].roomId;
       console.log(roomId);
@@ -46,18 +60,7 @@ io.on("connection", (socket) => {
 
   });
 
-  socket.on("localDescription", (params) => {
-    let roomId = users[socket.id].roomId;
-
-    let otherUsers = rooms[roomId].users;
-    otherUsers.forEach((otherUser) => {
-      if (otherUser !== socket.id) {
-        io.to(otherUser).emit("localDescription", {
-          description: params.description,
-        });
-      }
-    });
-  });
+  
   socket.on("sendMessage", (params) => {
     let message = params.message;
     let userEmail = params.userEmail;

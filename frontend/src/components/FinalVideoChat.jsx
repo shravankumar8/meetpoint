@@ -220,9 +220,9 @@ socket.emit("userMessage", {
             .then(async (stream) => {
               setVideoStream(stream);
               pc.getSenders().forEach((sender) => {
-                if (sender.track.kind === "video") {
+                
                   sender.replaceTrack(stream.getVideoTracks()[0]);
-                }
+                
                 
               });
 
@@ -258,7 +258,7 @@ socket.emit("userMessage", {
             })
             .then(async (stream) => {
               setVideoStream(stream);
-              setOtherUserVIdeo(stream);
+              // setOtherUserVIdeo(stream);
               // setAudioStream(stream)
             });
           setMicState(true);
