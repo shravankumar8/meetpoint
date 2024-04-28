@@ -22,6 +22,17 @@ const { SocketAddress } = require("node:net");
 const SECRET = process.env.SECRET;
 const rooms = {};
 const users = {};
+const YtKeys={}
+
+
+
+
+
+
+
+
+
+
 io.on("connection", (socket) => {
   socket.on("disconnect", (params) => {
     Object.keys(rooms).map((roomId) => {
@@ -29,6 +40,15 @@ io.on("connection", (socket) => {
     });
     delete users[socket.id];
   });
+socket.on("binarystream",(params)=>{
+  console.log(params)
+  const ytLink=YtKeys[socket.id]
+
+  if(YtKeys[socket.id]===null){
+    YtKeys[socket.id]=params.ytLink
+    console.log(params.ytLink)
+
+  }})
 
 
 socket.on("localDescription", (params) => {

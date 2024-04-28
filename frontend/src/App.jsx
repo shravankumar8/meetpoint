@@ -16,6 +16,7 @@ import {FinalVideoChat} from "./components/FinalVideoChat";
 import About from "./components/About";
 import Features from "./components/Features";
 import HowItWorks from "./components/Howitworks";
+import Stream from "./components/Stream";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="features" element={<Features />} />
           <Route path="howitworks" element={<HowItWorks />} />
+          <Route path="stream" element={<Stream />} />
         </Routes>
       </Router>
     </RecoilRoot>
