@@ -41,7 +41,9 @@ function Stream() {
   }
   function startStreaming() {
     try {
-      console.log("Streaming started");
+      alert(
+        "the broadcast has started ,please wait for stream to reflect on youtube "
+      );
       const mediaRecorder = new MediaRecorder(streamVideo, {
         videoBitsPerSecond: 2500000,
         audioBitsPerSecond: 1280000,
@@ -56,7 +58,7 @@ function Stream() {
           data: e.data,
           ytLink: ytKey,
         };
-      
+
         console.log("Media data available");
         socket.emit("binarystream", obj);
         // Handle the binary stream data here (e.g., save to a file)
@@ -113,13 +115,7 @@ function Stream() {
     },
   ];
 
-
   if (ytKey) {
-    
-   
-   
-
-
     return (
       <div>
         <div style={{ maxWidth: "40%", margin: "auto auto " }}>
