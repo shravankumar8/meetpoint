@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const { Server } = require("socket.io");
 const { createServer } = require("node:http");
 const app = express();
+const { spawn } = require('child_process');
+
 app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
@@ -13,6 +15,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
 const { User, Course, Admin } = require("./database/dbconnects");
 require("dotenv").config();
 const mongoose = require("mongoose");
@@ -22,9 +25,39 @@ const { SocketAddress } = require("node:net");
 const SECRET = process.env.SECRET;
 const rooms = {};
 const users = {};
-const YtKeys={}
+const YtKeys = {}
+
+function datasender(streamURL, Stream) {
+  const options = [
+    '-i',
+    '-',
+    '-c:v', 'libx264',
+    '-preset', 'ultrafast',
+    '-tune', 'zerolatency',
+    '-r', `${25}`,
+    '-g', `${25 * 2}`,
+    '-keyint_min', 25,
+    '-crf', '25',
+    '-pix_fmt', 'yuv420p',
+    '-sc_threshold', '0',
+    '-profile:v', 'main',
+    '-level', '3.1',
+    '-c:a', 'aac',
+    '-b:a', '128k',
+    '-ar', 128000 / 4,
+    '-f', 'flv',
+    `${streamURL}`,
+  ];
+  const ffmpegProcess = spawn('ffmpeg', options);
+  ffmpegProcess.stdout.on('data', (data) => {
+    console.log(`ffmpeg stdout: ${data}`);
+  });
+  ffmpegProcess.stderr.on('data', (data) => {
+    console.error(`ffmpeg stderr: ${data}`);
+  });
 
 
+}
 
 
 
@@ -40,47 +73,61 @@ io.on("connection", (socket) => {
     });
     delete users[socket.id];
   });
-socket.on("binarystream",(params)=>{
-  console.log(params)
-  const ytLink=YtKeys[socket.id]
+  socket.on("binarystream", (params) => {
+    // console.log(params
+    const ytLink = YtKeys[socket.id]
 
-  if(YtKeys[socket.id]===null){
-    YtKeys[socket.id]=params.ytLink
-    console.log(params.ytLink)
-
-  }})
+    if (YtKeys[socket.id] == undefined) {
+      YtKeys[socket.id] = params.ytLink
+      console.log(params.ytLink)
 
 
-socket.on("localDescription", (params) => {
-  let roomId = users[socket.id].roomId;
+    } else {
+      datasender(params.ytLink, params.data)
 
-  let otherUsers = rooms[roomId].users;
-  otherUsers.forEach((otherUser) => {
-    if (otherUser !== socket.id) {
-      io.to(otherUser).emit("localDescription", {
-        description: params.description,
-      });
     }
+
+
+
+
+
+
+
+
+
+  })
+
+
+  socket.on("localDescription", (params) => {
+    let roomId = users[socket.id].roomId;
+
+    let otherUsers = rooms[roomId].users;
+    otherUsers.forEach((otherUser) => {
+      if (otherUser !== socket.id) {
+        io.to(otherUser).emit("localDescription", {
+          description: params.description,
+        });
+      }
+    });
   });
-});
 
-  socket.on("userMessage",(params) => {
-      let roomId = users[socket.id].roomId;
-      console.log(roomId);
-       let otherUsers = rooms[roomId].users;
-    console.log(socket.id,"has sent",params.message)
+  socket.on("userMessage", (params) => {
+    let roomId = users[socket.id].roomId;
+    console.log(roomId);
+    let otherUsers = rooms[roomId].users;
+    console.log(socket.id, "has sent", params.message)
 
-     otherUsers.forEach((otherUser) => {
-       if (otherUser !== socket.id) {
-         io.to(otherUser).emit("userMessage", {
-           message: params.message,
-         });
-       }
-     });
+    otherUsers.forEach((otherUser) => {
+      if (otherUser !== socket.id) {
+        io.to(otherUser).emit("userMessage", {
+          message: params.message,
+        });
+      }
+    });
 
   });
 
-  
+
   socket.on("sendMessage", (params) => {
     let message = params.message;
     let userEmail = params.userEmail;
@@ -177,7 +224,7 @@ socket.on("localDescription", (params) => {
 
 app.use(express.json());
 app.get("/max", async (req, res) => {
-  res.json({ users:users,message:"testing the" });
+  res.json({ users: users, message: "testing the" });
 });
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
@@ -228,6 +275,6 @@ mongoose.connect(
 app.listen(3000, () => {
   console.log("server is listening on port 3000");
 });
-server.listen(3001,() => {
+server.listen(3001, () => {
   console.log("socket server is listening on port 3001");
 });
