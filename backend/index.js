@@ -75,11 +75,13 @@ io.on("connection", (socket) => {
   });
   socket.on("binarystream", (params) => {
     // console.log(params
+    // console.log(params
     const ytLink = YtKeys[socket.id]
 
     if (YtKeys[socket.id] == undefined) {
       YtKeys[socket.id] = params.ytLink
       console.log(params.ytLink)
+
 
 
     } else {
