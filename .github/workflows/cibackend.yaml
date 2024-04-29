@@ -24,7 +24,7 @@ jobs:
       with:
         node-version: '21'
 
-    - name: SSH and deploy
+    - name: SSH and deploy to aws
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
