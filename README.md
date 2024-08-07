@@ -4,50 +4,32 @@ methods to setups the project
 1.via docker
 2.raw setup
 
+#setups with docker
+
+
+
 # raw setup
 
-```
-docker compose watch
-```
 
-    OR
-
-> Install the Dependencies
-
+before make sure you have correct enviroment variables in your backend/.env
 ```
-cd daily-code
-yarn install
+cd frontend 
+npm install
+npm run dev
 ```
+this command starts frontend
 
-> Setup DB 
 
-For Mac and Linux users
-```
-cd packages/db
-chmod +x ./setupDB.sh
-./setupDB.sh
-```
 
-For Windows users
-```
-cd packages/db
-yarn prisma migrate dev
-yarn prisma db seed
-```
-
-> Run locally
+> start backend
 
 ```
-cd ../..
-yarn run dev
+cd backend
+npm run start
 ```
 
-
-
-http://meetpointapi.yourshravan.tech/ this doman serves the backend port which usually serves 3000
-http://meetpointapi.yourshravan.tech/max
+> 
 
 
 
-http://sockets.yourshravan.tech 
-http://sockets.yourshravan.tech/max
+
