@@ -1,37 +1,21 @@
-
-
+/* eslint-disable react/prop-types */
 import { Navbar } from "./Navbar";
 import { useRecoilValue } from "recoil";
 
 import { userEmailState } from "../store/selectors/userEmail";
 
-
-function Appbar() {
- 
+function Appbar({ theme, onToggleTheme }) {
   const userEmail = useRecoilValue(userEmailState);
 
-
- 
-
-  // const [userEmail, setUserEmail] = useState("");
-
-
-  if (userEmail) {
-
-    return (
-      <div>
-        
-        <Navbar isUserLoggedIn={true} />
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        
-        <Navbar isUserLoggedIn={false} />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Navbar
+        isUserLoggedIn={Boolean(userEmail)}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
+    </div>
+  );
 }
 
 export default Appbar;

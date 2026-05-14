@@ -1,29 +1,46 @@
 import "./App.css";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { LandingPage } from "./components/landingpage";
 import Signup from "./components/signup";
 import Signin from "./components/signin";
 import Appbar from "./components/Appbar";
 import Dashboard from "./components/Dashboard";
-import { RecoilRoot, useSetRecoilState } from "recoil";
-import { userState } from "./store/atom/user";
-import axios from "axios";
+import { RecoilRoot } from "recoil";
 import InitUser from "./components/initUser";
 import ChatRoom from "./components/Chatroom";
 import Textroom from "./components/Textroom";
 import VideoChat from "./components/VideoChat";
-import {FinalVideoChat} from "./components/FinalVideoChat";
+import { FinalVideoChat } from "./components/FinalVideoChat";
 import About from "./components/About";
 import Features from "./components/Features";
 import HowItWorks from "./components/Howitworks";
 import Stream from "./components/Stream";
+import {
+  applyTheme,
+  persistTheme,
+  resolveInitialTheme,
+  toggleTheme,
+} from "./theme";
 
 function App() {
+  const [theme, setTheme] = useState(() => resolveInitialTheme());
+
+  useEffect(() => {
+    applyTheme(theme);
+    persistTheme(theme);
+  }, [theme]);
+
   return (
     <RecoilRoot>
       <Router>
         <InitUser />
-        <Appbar />
+        <Appbar
+          theme={theme}
+          onToggleTheme={() =>
+            setTheme((currentTheme) => toggleTheme(currentTheme))
+          }
+        />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<Signup />} />
