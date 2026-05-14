@@ -1,5 +1,18 @@
+html {
+  --app-bg: #ffffff;
+  --app-text: #111827;
+  --app-nav-bg: #f5f5f5;
+}
+
+html[data-theme="dark"] {
+  --app-bg: #111827;
+  --app-text: #f9fafb;
+  --app-nav-bg: #1f2937;
+}
+
 body {
-  background-color: #ffffff;
+  background-color: var(--app-bg);
+  color: var(--app-text);
   padding: 0;
   margin: 0;
   font-family: "poppins", sans-serif;

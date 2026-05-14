@@ -1,8 +1,9 @@
+/* eslint-disable react/prop-types */
 import logoImage from "../assets/logo.png";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { userState } from "../store/atom/user";
-import { RecoilRoot, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
 export function Navbar(props) {
   const setUser = useSetRecoilState(userState);
@@ -17,7 +18,8 @@ export function Navbar(props) {
           
 
           zIndex: 1,
-          backgroundColor: "#F5F5F5",
+          backgroundColor: "var(--app-nav-bg)",
+          color: "var(--app-text)",
           height: "55px ",
           padding: "0px 58px",
           alignItems: "center",
@@ -84,6 +86,17 @@ export function Navbar(props) {
               How it works
             </li>
             <Button
+              onClick={props.onToggleTheme}
+              style={{
+                borderColor: "var(--app-text)",
+                color: "var(--app-text)",
+                fontSize: "18px",
+              }}
+              variant="outlined"
+            >
+              {props.theme === "dark" ? "Light mode" : "Dark mode"}
+            </Button>
+            <Button
               onClick={() => {
                 localStorage.setItem("token", null);
                 window.location.reload();
@@ -112,7 +125,8 @@ export function Navbar(props) {
           display: "flex",
 
           zIndex: 1,
-          backgroundColor: "#F5F5F5",
+          backgroundColor: "var(--app-nav-bg)",
+          color: "var(--app-text)",
           height: "55px ",
           padding: "0 58px",
           alignItems: "center",
@@ -170,6 +184,17 @@ export function Navbar(props) {
             >
               How it works
             </li>
+            <Button
+              onClick={props.onToggleTheme}
+              style={{
+                borderColor: "var(--app-text)",
+                color: "var(--app-text)",
+                fontSize: "18px",
+              }}
+              variant="outlined"
+            >
+              {props.theme === "dark" ? "Light mode" : "Dark mode"}
+            </Button>
             <Button
               onClick={() => {
                 // Remove token instead of setting to null
